@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhập mật khẩu 💖</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Hiệu ứng nền chuyển động nhẹ */
+    @keyframes glow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .bg-animate {
+      background: linear-gradient(270deg, #ffb6c1, #ffc0cb, #ffe4e1, #ff69b4);
+      background-size: 800% 800%;
+      animation: glow 6s ease infinite;
+    }
+  </style>
+</head>
+<body id="body" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 via-rose-100 to-purple-200 transition-all duration-700">
+  <div id="box" class="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-8 w-80 text-center border border-pink-300 transition-all duration-700">
+    <h1 class="text-2xl font-bold text-pink-600 mb-4">🔐 Nhập mật khẩu</h1>
+    <p class="text-gray-500 mb-6 text-sm">Hãy nhập tên của bạn để tiếp tục nhé 💕</p>
+    
+    <input id="password" type="text" placeholder="Nhập mật khẩu..." 
+           class="w-full p-3 border border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4 text-center transition">
+    
+    <button onclick="checkPassword()" 
+            class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded-xl transition duration-200">
+      Xác nhận
+    </button>
+    
+    <p id="error" class="text-red-500 mt-3 text-sm hidden">Sai mật khẩu rồi 😢</p>
+
+    <div id="success" class="hidden mt-5 text-pink-600 text-lg font-semibold animate-fade-in"></div>
+  </div>
+
+  <script>
+    const passwords = ["anh", "ánh", "nhi", "linh", "nga", "vy", "hằng", "thiên", "thảo", "thư", "ý", "uyên"];
+
+    function normalizeVietnamese(str) {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    function checkPassword() {
+      const input = document.getElementById("password").value.trim();
+      const normalizedInput = normalizeVietnamese(input);
+      const normalizedPasswords = passwords.map(p => normalizeVietnamese(p));
+      const error = document.getElementById("error");
+      const success = document.getElementById("success");
+      const body = document.getElementById("body");
+      const box = document.getElementById("box");
+
+      // Nếu đúng mật khẩu
+      if (normalizedPasswords.includes(normalizedInput)) {
+        error.classList.add("hidden");
+
+        // Thay đổi nền & hiển thị lời chúc
+        body.classList.add("bg-animate");
+        box.classList.add("bg-pink-50");
+        success.innerHTML = `🎉 Chúc mừng 20/10, <b>${input}</b> vui vẻ nhá`;
+        success.classList.remove("hidden");
+
+        // Sau 3 giây thì chuyển sang trang index
+        setTimeout(() => {
+          window.location.href = "./chinh/index.html";
+        }, 3000);
+      } 
+      else {
+        success.classList.add("hidden");
+        error.classList.remove("hidden");
+        error.classList.add("animate-bounce");
+        setTimeout(() => error.classList.remove("animate-bounce"), 800);
+      }
+    }
+
+    // Cho phép nhấn Enter để xác nhận
+    document.getElementById("password").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") checkPassword();
+    });
+  </script>
+</body>
+</html>

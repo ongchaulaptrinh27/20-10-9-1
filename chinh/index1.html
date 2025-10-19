@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trang chữ rơi - Chúc 20-10</title>
+  <style>
+    :root {
+      --bg:#000;
+      --pink:#ff4da6;
+      --light:#ffd6ea;
+      --font:monospace;
+    }
+
+    html, body {
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      font-family:var(--font);
+      overflow:hidden;
+      color:var(--light);
+    }
+
+    .column {
+      position:absolute;
+      top:0;
+      bottom:0;
+      width:2em;
+      overflow:hidden;
+      animation: fall 6s linear infinite;
+    }
+
+    .char {
+      display:block;
+      font-size:20px;
+      color:var(--pink);
+      text-shadow:0 0 8px var(--pink);
+    }
+
+    @keyframes fall {
+      0% { transform:translateY(-100%) }
+      100% { transform:translateY(100%) }
+    }
+
+    .overlay {
+      position:fixed;
+      inset:0;
+      display:grid;
+      place-items:center;
+      z-index:10;
+      pointer-events:none;
+    }
+
+    .card {
+      background:rgba(255,77,166,0.1);
+      border:1px solid rgba(255,77,166,0.4);
+      padding:36px 48px;
+      border-radius:20px;
+      backdrop-filter:blur(6px);
+      text-align:center;
+      transform:scale(0.8);
+      opacity:0;
+      transition:all .45s ease;
+      cursor:pointer; /* 👈 bấm được toàn thẻ */
+      pointer-events:auto; /* 👈 bật lại để click hoạt động */
+    }
+
+    .card h1 {
+      margin:0;
+      font-size:44px;
+      color:var(--pink);
+    }
+
+    .card p {
+      margin-top:12px;
+      color:var(--light);
+      font-weight:600;
+    }
+
+    .show {
+      opacity:1;
+      transform:scale(1);
+    }
+
+    @media (max-width:600px) {
+      .card h1 { font-size:28px; }
+      .card { padding:22px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="matrix"></div>
+  <div class="overlay" id="overlay">
+    <div class="card" id="card">
+      <h1>Chúc mừng 20-10</h1>
+      <p>bấm vào đây để típ tục nek</p>
+    </div>
+  </div>
+
+  <script>
+    const messages = [
+      '你好你好你好你好你好你好',
+      '你好你好你好',
+      '你好你好你好',
+      '你好你好你好你好',
+      '你好你好你好',
+      '你好你好你好',
+      '你好你好',
+      '你好你好你好你好',
+      '你好你好你好',
+      '你好你好你好你好',
+      '你你好你好你好你好好',
+      '你你好你好你好好',
+      '你你好你好你好好',
+      '你你好你好好',
+      '你好你好你好',
+      '你你好你好你好好',
+      '你好你好你好你好你好你好你好'
+    ];
+
+    const matrix = document.getElementById('matrix');
+    const width = window.innerWidth;
+    const numCols = Math.floor(width / 40);
+
+    function randomMsg() {
+      return messages[Math.floor(Math.random() * messages.length)];
+    }
+
+    function createColumn(x) {
+      const col = document.createElement('div');
+      col.className = 'column';
+      col.style.left = x * 40 + 'px';
+      col.style.animationDuration = (4 + Math.random() * 4) + 's';
+
+      const msg = randomMsg();
+      for (let ch of msg) {
+        const span = document.createElement('span');
+        span.className = 'char';
+        span.textContent = ch;
+        col.appendChild(span);
+      }
+      matrix.appendChild(col);
+
+      setTimeout(() => col.remove(), 8000);
+    }
+
+    setInterval(() => {
+      const x = Math.floor(Math.random() * numCols);
+      createColumn(x);
+    }, 120);
+
+    setTimeout(() => {
+      const card = document.getElementById('card');
+      card.classList.add('show');
+
+      // 👇 Khi bấm vào toàn bộ thẻ card => sang index3.html
+      card.addEventListener('click', () => {
+        window.location.href = 'index2.html';
+      });
+    }, 4000);
+  </script>
+</body>
+</html>
