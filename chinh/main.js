@@ -1,3 +1,5 @@
+let hasReloaded = false; // Biến đánh dấu đã reload hay chưa
+
 function checkOrientation() {
   if (window.innerHeight > window.innerWidth) {
     // Nếu đang ở chế độ dọc
@@ -18,8 +20,11 @@ function checkOrientation() {
       </div>
     `;
   } else {
-    // Nếu xoay ngang thì reload lại trang gốc
-    location.reload();
+    // Nếu xoay ngang mà chưa reload lần nào thì reload 1 lần
+    if (!hasReloaded) {
+      hasReloaded = true;
+      location.reload();
+    }
   }
 }
 
