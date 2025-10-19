@@ -1,163 +1,517 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Trang chữ rơi - Chúc 20-10</title>
-  <style>
-    :root {
-      --bg:#000;
-      --pink:#ff4da6;
-      --light:#ffd6ea;
-      --font:monospace;
-    }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Bóng Bay</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --accent: #ff7f50;
+            --accent-2: #ff5722;
+        }
 
-    html, body {
-      height:100%;
-      margin:0;
-      background:var(--bg);
-      font-family:var(--font);
-      overflow:hidden;
-      color:var(--light);
-    }
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: "Mali", cursive;
+            background-image: url('bgr.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
 
-    .column {
-      position:absolute;
-      top:0;
-      bottom:0;
-      width:2em;
-      overflow:hidden;
-      animation: fall 6s linear infinite;
-    }
+        .stage {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+        }
 
-    .char {
-      display:block;
-      font-size:20px;
-      color:var(--pink);
-      text-shadow:0 0 8px var(--pink);
-    }
+        canvas#starfield {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
 
-    @keyframes fall {
-      0% { transform:translateY(-100%) }
-      100% { transform:translateY(100%) }
-    }
+        .moon {
+            position: absolute;
+            top: 60px;
+            right: 100px;
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle at 30% 30%, #fff, #f8f8f8 70%, #e0e0e0 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 0 50px #ffffff7a,
+                0 0 80px rgba(255, 255, 255, 0.7),
+                0 0 100ox rgba(255, 255, 255, 0.4);
+            filter: drop-shadow(0 0 25px rgba(255, 255, 200, 0.8));
+            animation: moonGlow 6s ease-in-out infinite;
+            z-index: 10;
+        }
 
-    .overlay {
-      position:fixed;
-      inset:0;
-      display:grid;
-      place-items:center;
-      z-index:10;
-      pointer-events:none;
-    }
+        @media (max-width:600px) {
+            .moon {
+                top: 40px;
+                right: 14px;
+                width: 70px;
+                height: 70px;
+            }
 
-    .card {
-      background:rgba(255,77,166,0.1);
-      border:1px solid rgba(255,77,166,0.4);
-      padding:36px 48px;
-      border-radius:20px;
-      backdrop-filter:blur(6px);
-      text-align:center;
-      transform:scale(0.8);
-      opacity:0;
-      transition:all .45s ease;
-      cursor:pointer; /* 👈 bấm được toàn thẻ */
-      pointer-events:auto; /* 👈 bật lại để click hoạt động */
-    }
+        }
 
-    .card h1 {
-      margin:0;
-      font-size:44px;
-      color:var(--pink);
-    }
+        #lantern-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
 
-    .card p {
-      margin-top:12px;
-      color:var(--light);
-      font-weight:600;
-    }
+        .lantern {
+            position: absolute;
+            pointer-events: auto;
+            width: 40px;
+            user-select: none;
+        }
 
-    .show {
-      opacity:1;
-      transform:scale(1);
-    }
+        @keyframes swing {
+            0% {
+                transform: rotate(-5deg);
+            }
 
-    @media (max-width:600px) {
-      .card h1 { font-size:28px; }
-      .card { padding:22px 20px; }
-    }
-  </style>
+            50% {
+                transform: rotate(5deg);
+            }
+
+            100% {
+                transform: rotate(-5deg);
+            }
+        }
+
+        .swing {
+            animation: swing 2s ease-in-out infinite;
+        }
+
+        #hint {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0);
+            color: #ffa722;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 28px;
+            font-weight: 800;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 1000;
+            pointer-events: none;
+            text-align: center;
+            white-space: nowrap;
+            text-shadow:
+                0 0 15px #ff8a50,
+                0 0 20px #ffd180;
+
+        }
+
+        @media (max-width: 600px) {
+            #hint {
+                font-size: 22px;
+                padding: 8px 12px;
+            }
+        }
+
+        #wish-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.96);
+            color: #ff8d22;
+            padding: 35px 40px;
+            border-radius: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+            text-align: center;
+            max-width: 60%;
+            width: auto;
+            box-sizing: border-box;
+            pointer-events: auto;
+            text-shadow:
+                0 0 25px #ffd180;
+            box-shadow:
+                0 0 20px #ff8a50,
+                0 0 25px #ffd180;
+        }
+
+        @media (max-width: 600px) {
+            #wish-popup {
+                font-size: 1.2rem;
+                padding: 20px 25px;
+                max-width: 80%;
+                width: 80%;
+            }
+        }
+
+        .controls {
+            position: fixed;
+            left: 18px;
+            top: 18px;
+            z-index: 10;
+            color: #fff;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
+        .music-toggle {
+            cursor: pointer;
+            margin-left: 10px;
+            color: #fff;
+            opacity: 0.95;
+        }
+
+        #bottom-image-container {
+            position: fixed;
+            bottom: 0;
+            right: 20px;
+            transform: none;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #bottom-image-container img {
+            height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            #bottom-image-container img {
+                height: 20px;
+            }
+        }
+        /* Ngăn các phần tử bay cản click */
+#starfield,
+#lantern-container img.lantern,
+.moon {
+  pointer-events: none !important;
+}
+
+/* Cho phép click popup (để ẩn) và body nhận click */
+#wish-popup {
+  pointer-events: auto !important;
+}
+#wish-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.96);
+  color: #ff8d22;
+  padding: 35px 40px 60px;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: none;
+  z-index: 9999;
+  text-align: center;
+  max-width: 60%;
+  width: auto;
+  box-shadow: 0 0 25px #ff8a50, 0 0 25px #ffd180;
+}
+
+#wish-text {
+  text-shadow: 0 0 25px #ffd180;
+}
+
+#next-wish {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(45deg, #ff7f50, #ff5722);
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(255, 87, 34, 0.6);
+  transition: all 0.3s ease;
+}
+
+#next-wish:hover {
+  transform: translateX(-50%) scale(1.05);
+  background: linear-gradient(45deg, #ff8d50, #ff7043);
+}
+
+
+    </style>
 </head>
-<body>
-  <div id="matrix"></div>
-  <div class="overlay" id="overlay">
-    <div class="card" id="card">
-      <h1>Chúc mừng 20-10</h1>
-      <p>bấm vào đây để típ tục nek</p>
-    </div>
-  </div>
 
-  <script>
-    const messages = [
-      '你好你好你好你好你好你好',
-      '你好你好你好',
-      '你好你好你好',
-      '你好你好你好你好',
-      '你好你好你好',
-      '你好你好你好',
-      '你好你好',
-      '你好你好你好你好',
-      '你好你好你好',
-      '你好你好你好你好',
-      '你你好你好你好你好好',
-      '你你好你好你好好',
-      '你你好你好你好好',
-      '你你好你好好',
-      '你好你好你好',
-      '你你好你好你好好',
-      '你好你好你好你好你好你好你好'
+<body>
+    <div class="stage">
+        <canvas id="starfield"></canvas>
+
+        <div class="moon" aria-hidden="true"></div>
+
+        <div id="lantern-container"></div>
+
+        <div id="wish-popup" role="dialog" aria-live="polite"></div>
+
+        <div id="bottom-image-container">
+        </div>
+
+        <div id="hint">bấm vào màng hình</div>
+
+        <audio id="bg-music" loop>
+            <source src="nhac.mp3" type="audio/mp3">
+            Trình duyệt của bạn không hỗ trợ thẻ audio.
+        </audio>
+    </div>
+
+    <script>
+    // ===== Canvas sao và sao băng =====
+    const canvas = document.getElementById("starfield");
+    const ctx = canvas.getContext("2d");
+    let w, h, stars = [], meteors = [];
+
+    function resizeCanvas() {
+        w = canvas.width = innerWidth;
+        h = canvas.height = innerHeight;
+        stars = [];
+        const count = Math.round((w * h) / 2200);
+        for (let i = 0; i < count; i++) {
+            stars.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: Math.random() * 0.9 + 0.1,
+                a: Math.random() * 0.8 + 0.2,
+                t: Math.random() * 0.02 + 0.002
+            });
+        }
+    }
+
+    function drawStars() {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+            s.a += (Math.random() > 0.5 ? 1 : -1) * s.t;
+            s.a = Math.max(0.05, Math.min(1, s.a));
+            ctx.beginPath();
+            ctx.globalAlpha = s.a;
+            ctx.fillStyle = "#fff";
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    function createMeteor() {
+        const startX = Math.random() * w;
+        const startY = Math.random() * (h / 3);
+        const speed = Math.random() * 10 + 6;
+        meteors.push({
+            x: startX,
+            y: startY,
+            vx: speed + 6,
+            vy: speed / 2,
+            len: Math.random() * 120 + 100,
+            a: 1
+        });
+    }
+
+    function drawMeteors() {
+        for (let i = meteors.length - 1; i >= 0; i--) {
+            const m = meteors[i];
+            const x2 = m.x - m.len;
+            const y2 = m.y - m.len / 2;
+            const g = ctx.createLinearGradient(m.x, m.y, x2, y2);
+            g.addColorStop(0, `rgba(255,255,255,${m.a})`);
+            g.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(m.x, m.y);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            m.x += m.vx;
+            m.y += m.vy;
+            m.a -= 0.02;
+            if (m.a <= 0 || m.x > w + 200 || m.y > h + 200) meteors.splice(i, 1);
+        }
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+    }
+
+    function loop() {
+        drawStars();
+        drawMeteors();
+        if (Math.random() < 0.01) createMeteor();
+        requestAnimationFrame(loop);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    loop();
+
+
+    // ===== Đèn lồng + Lời chúc =====
+    const lanternContainer = document.getElementById("lantern-container");
+    const wishes = [
+        "hé lo mọi người",
+        "chào mọi ngừ đến với wed của mình",
+        "mình có 1 món quà nho nhỏ",
+        "hi vọng ko chê nha",
+        "và típ tục hoii<3333"
     ];
 
-    const matrix = document.getElementById('matrix');
-    const width = window.innerWidth;
-    const numCols = Math.floor(width / 40);
+    const lanternImages = [
+        "anh1.png", "anh2.png", "anh3.png", "anh4.png", "anh5.png"
+    ];
 
-    function randomMsg() {
-      return messages[Math.floor(Math.random() * messages.length)];
+    function createLantern() {
+        const lantern = document.createElement("img");
+        lantern.src = lanternImages[Math.floor(Math.random() * lanternImages.length)];
+        lantern.className = "lantern swing";
+
+        const layer = Math.floor(Math.random() * 3) + 1;
+        let size = 40, duration = 10000, opacity = 0.8;
+
+        if (layer === 1) {
+            size = 20 + Math.random() * 20;
+            duration = 14000 + Math.random() * 5000;
+            opacity = 0.5;
+        } else if (layer === 2) {
+            size = 30 + Math.random() * 30;
+            duration = 12000 + Math.random() * 4000;
+            opacity = 0.7;
+        } else {
+            size = 40 + Math.random() * 40;
+            duration = 10000 + Math.random() * 3000;
+            opacity = 0.95;
+        }
+
+        lantern.style.width = size + "px";
+        lantern.style.left = Math.random() * 90 + "vw";
+        lantern.style.bottom = "0px";
+        lantern.style.opacity = opacity;
+        lantern.style.pointerEvents = "none";
+
+        lanternContainer.appendChild(lantern);
+
+        const drift = Math.random() * 140 - 70;
+        const up = 120 + Math.random() * 40;
+        lantern.animate(
+            [
+                { transform: "translate(0,0)", opacity: opacity },
+                { transform: `translate(${drift}px, -${up}vh)`, opacity: 0 }
+            ],
+            { duration: duration, easing: "linear", fill: "forwards" }
+        );
+
+        setTimeout(() => lantern.remove(), duration);
     }
 
-    function createColumn(x) {
-      const col = document.createElement('div');
-      col.className = 'column';
-      col.style.left = x * 40 + 'px';
-      col.style.animationDuration = (4 + Math.random() * 4) + 's';
+    setInterval(createLantern, 500);
 
-      const msg = randomMsg();
-      for (let ch of msg) {
-        const span = document.createElement('span');
-        span.className = 'char';
-        span.textContent = ch;
-        col.appendChild(span);
-      }
-      matrix.appendChild(col);
 
-      setTimeout(() => col.remove(), 8000);
-    }
+    // ===== Nhạc nền =====
+    const bg = document.getElementById("bg-music");
+    const hint = document.getElementById("hint");
+    let musicStarted = false;
 
-    setInterval(() => {
-      const x = Math.floor(Math.random() * numCols);
-      createColumn(x);
-    }, 120);
+    document.addEventListener("pointerdown", function startMusicOnce() {
+        if (!musicStarted && bg) {
+            bg.volume = 0;
+            bg.play().then(() => {
+                let v = 0;
+                const fadeIn = setInterval(() => {
+                    v += 0.05;
+                    if (v >= 0.9) {
+                        v = 0.9;
+                        clearInterval(fadeIn);
+                    }
+                    bg.volume = v;
+                }, 120);
+                musicStarted = true;
+
+                for (let i = 0; i < 4; i++) setTimeout(createLantern, i * 300);
+            }).catch(() => { });
+        }
+        document.removeEventListener("pointerdown", startMusicOnce);
+    });
 
     setTimeout(() => {
-      const card = document.getElementById('card');
-      card.classList.add('show');
+        if (hint) {
+            hint.style.opacity = "1";
+            setTimeout(() => { hint.style.opacity = "0"; }, 5000);
+        }
+    }, 1000);
 
-      // 👇 Khi bấm vào toàn bộ thẻ card => sang index3.html
-      card.addEventListener('click', () => {
-        window.location.href = 'index2.html';
-      });
-    }, 4000);
-  </script>
+
+    // ===== Popup lời chúc có nút Tiếp =====
+const wishPopup = document.getElementById("wish-popup");
+wishPopup.innerHTML = `
+    <div id="wish-text"></div>
+    <button id="next-wish">Tiếp ➜</button>
+`;
+const wishText = document.getElementById("wish-text");
+const nextBtn = document.getElementById("next-wish");
+let currentWishIndex = 0;
+
+function showWish() {
+    wishText.textContent = wishes[currentWishIndex];
+    wishPopup.style.display = "block";
+
+    // Nếu là câu cuối cùng thì đổi nút thành "Chuyển tiếp ➜"
+    if (currentWishIndex === wishes.length - 1) {
+        nextBtn.textContent = "Chuyển tiếp ➜";
+    } else {
+        nextBtn.textContent = "Tiếp ➜";
+    }
+}
+
+// Bấm vào màn hình lần đầu sẽ hiện popup
+document.addEventListener("click", (e) => {
+    if (e.target.closest("#wish-popup")) return; // bấm trong popup thì bỏ qua
+    if (wishPopup.style.display !== "block") {
+        showWish();
+    }
+});
+
+// Nút "Tiếp" hoặc "Chuyển tiếp"
+nextBtn.addEventListener("click", () => {
+    // Nếu đang ở câu cuối cùng → chuyển trang
+    if (currentWishIndex === wishes.length - 1) {
+        window.location.href = "index2.html";
+        return;
+    }
+
+    // Ngược lại thì hiển thị câu tiếp theo
+    currentWishIndex++;
+    showWish();
+});
+
+</script>
+
+
 </body>
+
 </html>
