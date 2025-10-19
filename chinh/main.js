@@ -1,5 +1,3 @@
-let hasReloaded = false; // Biến đánh dấu đã reload hay chưa
-
 function checkOrientation() {
   if (window.innerHeight > window.innerWidth) {
     // Nếu đang ở chế độ dọc
@@ -20,9 +18,9 @@ function checkOrientation() {
       </div>
     `;
   } else {
-    // Nếu xoay ngang mà chưa reload lần nào thì reload 1 lần
-    if (!hasReloaded) {
-      hasReloaded = true;
+    // Nếu xoay ngang và chưa reload lần nào thì reload 1 lần
+    if (!sessionStorage.getItem('hasReloadedLandscape')) {
+      sessionStorage.setItem('hasReloadedLandscape', 'true');
       location.reload();
     }
   }
